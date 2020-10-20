@@ -1,0 +1,154 @@
+#include <functional>
+#include <iostream>
+#include <clocale>
+#include <cmath>
+
+using namespace std;
+
+double cos_fun(double x) { return cos(x); }
+double sin_fun(double x) { return sin(x); }
+double x_fun(double x) { return x; }
+double x_square_fun(double x) { return x * x; }
+
+function<double(double)> f_cos = cos_fun;
+function<double(double)> f_sin = sin_fun;
+
+double TrapIntegral(double& a, double& b, int &n, const function<double(double)>& f) {
+
+	double width = (b - a) / n;
+	double trap_integral = 0;
+
+	for (int step = 0; step < (int)n; step++) {
+		const double x1 = a + step * width;
+		const double x2 = a + (step + 1) * width;
+
+		trap_integral += 0.5 * (x2 - x1) * (f(x1) + f(x2));
+	}
+	return trap_integral;
+}
+
+double StolbIntegral(double& a, double& b, int &n, const function<double(double)>& f) {
+
+	double width = (b - a) / n;
+	double stolb_integral = 0;
+
+	for (int step = 0; step <(int)n; step++) {
+		const double x1 = a + step * width;
+		const double x2 = a + (step + 1) * width;
+
+		stolb_integral += f(x1) * (x2 - x1);
+	}
+	return stolb_integral;
+}
+
+
+int main() {
+	setlocale(LC_ALL, "Russian");
+
+	bool cond = true;
+
+	int action{ 0 };
+	char choice{ 0 };
+	char method{ 0 };
+
+	char* method_flag = &method;
+
+	double a, b;
+	double delta = 0.0;
+	int n; 
+
+	function<double(double)> f;
+
+	cout << "1 - выбор ф-ии интегрирования" << "\n" << "2 - выбор метода интегрирования" << "\n" <<
+		"3 - выбор шага и отрезка интегрирвоания" << "\n" << "4 - подсчёт" <<
+		"\n" << "5 - выход" << "\n";
+
+	while (cond == true) {
+		cout << "Выберите один из пунутов 1-5" << "\n";
+		cin >> action;
+		switch (action) {
+		case 1:
+				cout << "Выберите ф-ию интегрирования: a - cos, b - sin, c - x, d - x^2" << "\n";
+				cin >> choice;
+				switch (choice) {
+				case 'a':
+					f = cos_fun;
+					break;
+				case 'b':
+					f = sin_fun;
+					break;
+				case 'c':
+					f = x_fun;
+					break;
+				case 'd':
+					f = x_square_fun;
+					break;
+				default: cout << "Введите a, или b, или c, или d!(латинские)" << "\n";
+					break;
+				}
+				break;
+
+		case 2:
+				cout << "Выберите метод интегрирования: a - трапеции, b - столбики" << "\n";
+				cin >> choice;
+
+				switch (choice) {
+				case 'a':
+					*method_flag = 't';
+					break;
+
+				case 'b':
+					*method_flag = 's';
+					break;
+
+				default: cout << "Выберите a или b! (латинские)" << "\n";
+					break;
+				}
+
+				break;
+
+		case 3:
+				cout << "Введите шаг и отрезок интегрирования: a - шаг, b - отрезок" << "\n";
+				cin >> choice;
+
+				switch (choice) {
+				case 'a':
+					cin >> delta;
+					break;
+
+				case 'b':
+					cin >> a >> b;
+					n = (int)(b - a) / delta;
+					break;
+
+				default: cout << "Выберите a или b! (латинские)" << "\n";
+					break;
+				}
+
+				break;
+				
+
+		case 4:
+				if (*method_flag == 't') {
+					double ans{ 0 };
+					ans = TrapIntegral(a, b, n, f);
+					cout << ans << "\n";
+				}
+
+				if (*method_flag == 's') {
+					double ans{ 0 };
+					ans = StolbIntegral(a, b, n, f);
+					cout << ans << "\n";
+				}
+				break;
+
+		case 5:
+				cout << "Выход из программы!";
+				cond = false;
+				break;
+
+		default: cout << "Выберите один из пунктов 1-5!" << "\n";
+				break;
+			}
+		}
+	}
